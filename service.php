@@ -2,7 +2,7 @@
 
 include 'conexion.php';
 $pdo = new Conexion();
-
+header("Content-Type: application/json");
 if($_SERVER['REQUEST_METHOD'] == 'GET'){
     if(isset($_GET['id']))
     {
@@ -11,7 +11,7 @@ if($_SERVER['REQUEST_METHOD'] == 'GET'){
         $sql->execute();
         $sql->setFetchMode(PDO::FETCH_ASSOC);
         header("HTTP/1.1 200 hay datos");
-        echo json_encode($sql->fetchAll());
+        echo '{"alumnos": ' . json_encode($sql->fetchAll()) . '}';
         exit;				
         
         } else {
@@ -20,7 +20,7 @@ if($_SERVER['REQUEST_METHOD'] == 'GET'){
         $sql->execute();
         $sql->setFetchMode(PDO::FETCH_ASSOC);
         header("HTTP/1.1 200 hay datos");
-        echo json_encode($sql->fetchAll());
+        echo '{"alumnos": ' . json_encode($sql->fetchAll()) . '}';
         exit;		
     }
 }
@@ -56,9 +56,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST')
 
     if($_SERVER['REQUEST_METHOD'] == 'DELETE')
 	{
+		$data = json_decode(file_get_contents("php://input"), true);
+		$id = $data["id"];
 		$sql = "DELETE FROM `alumnos` WHERE id=:id";
 		$stmt = $pdo->prepare($sql);
-        $stmt->bindValue(':id', $_GET['id']);
+        $stmt->bindParam(":id", $id, PDO::PARAM_INT);
 		$stmt->execute();
 			header("HTTP/1.1 200 Ok");
 			exit;
